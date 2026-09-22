@@ -99,6 +99,15 @@ app.get('/api/me', { preHandler: requirePlayer }, async (request, reply) => {
 });
 
 // ---------------------------------------------------------------------------
+// Global Information
+// ---------------------------------------------------------------------------
+
+app.get('/api/get_leaderboard', async () => {
+  const player = await players.getLeaderBoard();
+  return player;
+});
+
+// ---------------------------------------------------------------------------
 // Player state (all routes require a token for the same player id)
 // ---------------------------------------------------------------------------
 
@@ -110,6 +119,19 @@ app.get('/api/player/:id', { preHandler: requirePlayer }, async (request, reply)
     return reply.code(404).send({ error: 'Player not found' });
   }
   return player;
+});
+
+
+
+
+app.get('/api/player/:id/money_units', { preHandler: requirePlayer }, async (request, reply) => {
+  if (!isUuid(request.params.id)) return badRequest(reply, 'id must be a uuid');
+
+  const money = await players.getMoneyUnits(request.params.id);
+  if (money === null) {
+    return reply.code(404).send({ error: 'Player not found' });
+  }
+  return { money };
 });
 
 app.get('/api/player/:id/money', { preHandler: requirePlayer }, async (request, reply) => {

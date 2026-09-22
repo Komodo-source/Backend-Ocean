@@ -25,7 +25,14 @@ cp .env.example .env
 psql "$DATABASE_URL" -f schema.sql
 ```
 
-4. Start the server:
+4. Seed the catalog ids the players claim (`vessel`/`port` hold only an id, so
+   the seed is generated from the frontend catalogs - see "Catalog id mapping"):
+
+```bash
+psql "$DATABASE_URL" -f "../sea-builder/insert vessel and port public.sql"
+```
+
+5. Start the server:
 
 ```bash
 npm run dev     # node --watch
@@ -131,6 +138,14 @@ id 1  ->  00000000-0000-4000-8000-000000000001
 ```
 
 Keeping the low 12 hex digits the catalog id means the mapping is reversible.
+
+`sea-builder/insert vessel and port public.sql` pre-inserts one row per catalog
+entry using this mapping, so `player_port.port_id` / `player_vessel.vessel_id`
+resolve. It is generated, and safe to re-run:
+
+```bash
+cd sea-builder && node scripts/generate-vessel-port-seed.js
+```
 
 ## Other scripts
 

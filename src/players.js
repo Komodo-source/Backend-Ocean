@@ -17,6 +17,14 @@ async function findById(id) {
   return rows[0] || null;
 }
 
+async function getLeaderBoard() {
+  const { rows } = await query(
+    `select user_name, money from public.player ORDER BY money ASC LIMIT 25`,
+    []
+  );
+  return rows[0] || null;
+}
+
 /** Includes password_hash — only for the login flow. */
 async function findByUserNameWithHash(userName) {
   const { rows } = await query(
@@ -39,6 +47,14 @@ async function create({ userName, passwordHash }) {
 async function getMoney(id) {
   const { rows } = await query(
     'select money from public.player where id_player = $1',
+    [id]
+  );
+  return rows[0] ? rows[0].money : null;
+}
+
+async function getMoneyUnits(id) {
+  const { rows } = await query(
+    'select money_units from public.player where id_player = $1',
     [id]
   );
   return rows[0] ? rows[0].money : null;
@@ -68,7 +84,7 @@ async function addMoney(id, delta) {
 
 async function listVessels(playerId) {
   const { rows } = await query(
-    `select v.id_vessel, v.id_vessel as vessel_id
+    `select v.id_vessel, v.id_vessel as vessel_id, moving_to
      from public.player_vessel pv
      join public.vessel v on v.id_vessel = pv.vessel_id
      where pv.player_id = $1
@@ -153,4 +169,5 @@ module.exports = {
   detachVessel,
   attachPort,
   detachPort,
+  getLeaderBoard
 };
